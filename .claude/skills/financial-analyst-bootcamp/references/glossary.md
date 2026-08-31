@@ -67,8 +67,53 @@ saves, `ROLLBACK` undoes.
 
 **View** — a saved query. Behaves like a table but stores no data of its own.
 
+**Spaced repetition** — reviewing something just before you would have
+forgotten it, so total effort stays small and retention stays high. Run by
+`scripts/srs.py` in this course.
+
 **Window function** — a calculation across nearby rows that keeps every row.
 Growth versus last month, running totals, rankings.
+
+## Power BI and dashboard terms
+
+**Calculated column** — a column computed row by row and stored in the file.
+Does not respond to slicers. Use it for something you group *by*.
+
+**CALCULATE** — the central DAX function. Evaluates an expression with the
+filter context changed. It is SUMIFS for a data model.
+
+**Cardinality** — how many rows on each side of a relationship match. One
+department to many journal lines is one-to-many, which is what you want.
+
+**DAX** — the formula language of Power BI. Looks like Excel, behaves nothing
+like it.
+
+**DirectQuery** — leaving the data in the database and querying it live, one
+query per visual. Slower; use only when Import will not do.
+
+**Filter context** — the set of filters a measure is evaluated under: the
+slicers plus the row and column headers of the cell being computed.
+
+**Import mode** — copying the data into the .pbix file. Fast, compressed, the
+default and usually right.
+
+**Measure** — a calculation evaluated on the fly for whatever the user has
+filtered. Prefer these to calculated columns.
+
+**Power Query** — Power BI's ETL layer: the recorded sequence of cleaning
+steps that re-runs on every refresh.
+
+**Row context** — being on one particular row, which happens inside a
+calculated column or an iterator like SUMX.
+
+**Row-level security (RLS)** — rules limiting which rows a given viewer can
+see. Applied on the server, so it survives the file being downloaded.
+
+**Time intelligence** — DAX functions such as TOTALYTD and
+SAMEPERIODLASTYEAR. They require a properly marked date table.
+
+**Workspace** — where reports live in the Power BI Service. An *app* is how
+you publish them to readers.
 
 ## Finance and modelling terms
 

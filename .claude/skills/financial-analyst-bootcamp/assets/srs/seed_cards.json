@@ -1,0 +1,1312 @@
+[
+ {
+  "ref": "m0-grain",
+  "module": 0,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What does the word 'grain' mean when someone asks about a table, and why is it the first question you should ask?",
+  "answer": "The grain is what one row of the table represents - one invoice, one journal line, one company on one day. It is first because almost every serious analytical bug comes from joining or aggregating two tables at different grains.",
+  "tags": [
+   "grain"
+  ]
+ },
+ {
+  "ref": "m0-pk",
+  "module": 0,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is a primary key, in one sentence, using a finance example?",
+  "answer": "The column that uniquely identifies a row - the invoice number on an invoice table. Never blank, never repeated, never reused.",
+  "tags": [
+   "keys"
+  ]
+ },
+ {
+  "ref": "m0-fk",
+  "module": 0,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is a foreign key?",
+  "answer": "A column that points at another table's primary key - the customer code sitting on an invoice, pointing at the customer master.",
+  "tags": [
+   "keys"
+  ]
+ },
+ {
+  "ref": "m0-gl-grain",
+  "module": 0,
+  "part": "SQL",
+  "kind": "number",
+  "question": "What is the grain of gl_journal_line, and how many lines does each journal have in our dataset?",
+  "answer": "One line of one journal entry. Every journal_id has exactly two lines, and debits equal credits.",
+  "tags": [
+   "dataset"
+  ]
+ },
+ {
+  "ref": "m0-why-dimdate",
+  "module": 0,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why does dim_date exist when PostgreSQL already understands dates?",
+  "answer": "Because our fiscal year runs April to March, so calendar year, quarter and month are not the same as fiscal year, quarter and month. The calendar table works that out once instead of in fifty separate queries.",
+  "tags": [
+   "dates"
+  ]
+ },
+ {
+  "ref": "m1-null-equals",
+  "module": 1,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why does WHERE end_date = NULL return no rows, and what should you write instead?",
+  "answer": "NULL means unknown, so 'unknown = unknown' evaluates to unknown, not true, and unknown rows are not returned. Use IS NULL / IS NOT NULL.",
+  "tags": [
+   "null"
+  ]
+ },
+ {
+  "ref": "m1-row-order",
+  "module": 1,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Without ORDER BY, what order do rows come back in?",
+  "answer": "No guaranteed order at all. The same query can return rows differently on different runs. Spreadsheets always have an order; tables do not.",
+  "tags": [
+   "basics"
+  ]
+ },
+ {
+  "ref": "m1-clause-order",
+  "module": 1,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Write out the clause order of a SQL statement from memory.",
+  "answer": "SELECT / FROM / WHERE / GROUP BY / HAVING / ORDER BY / LIMIT. Not every clause is needed, but they can never appear in a different sequence.",
+  "tags": [
+   "basics"
+  ]
+ },
+ {
+  "ref": "m1-and-or",
+  "module": 1,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is the risk in WHERE a AND b OR c?",
+  "answer": "AND binds tighter than OR, so it means (a AND b) OR c - probably not what you meant. Always bracket mixed AND/OR conditions.",
+  "tags": [
+   "basics"
+  ]
+ },
+ {
+  "ref": "m1-between",
+  "module": 1,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Does BETWEEN include its endpoints?",
+  "answer": "Yes, both. BETWEEN '2025-04-01' AND '2026-03-31' includes both dates. With timestamps rather than dates this is a classic source of a missing final day.",
+  "tags": [
+   "basics"
+  ]
+ },
+ {
+  "ref": "m2-int-div",
+  "module": 2,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why does SELECT 7/2 return 3, and how do you fix it?",
+  "answer": "Both operands are whole numbers, so PostgreSQL does integer division. Cast one side: 7::numeric/2, or write 7.0/2. A margin computed this way reads as 0%.",
+  "tags": [
+   "types"
+  ]
+ },
+ {
+  "ref": "m2-float-money",
+  "module": 2,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why must money never be stored as FLOAT?",
+  "answer": "Floats store numbers in binary, and 0.1 in binary recurs the way 1/3 recurs in decimal. 0.1 + 0.2 comes back as 0.30000000000000004. Use NUMERIC for anything that has to add up.",
+  "tags": [
+   "types"
+  ]
+ },
+ {
+  "ref": "m2-nullif",
+  "module": 2,
+  "part": "SQL",
+  "kind": "query",
+  "question": "How do you stop a division-by-zero from taking down a 200-row report?",
+  "answer": "Wrap the denominator: x / NULLIF(y, 0). A zero denominator becomes NULL, so that one row comes back blank instead of the whole query failing.",
+  "tags": [
+   "robustness"
+  ]
+ },
+ {
+  "ref": "m2-bps",
+  "module": 2,
+  "part": "SQL",
+  "kind": "number",
+  "question": "A margin moves from 22.4% to 23.1%. By how many basis points, and what is the wrong way to say it?",
+  "answer": "Up 70 basis points. Saying 'up 0.7%' is wrong - that would mean 22.4% x 1.007. One percent is 100 basis points.",
+  "tags": [
+   "finance"
+  ]
+ },
+ {
+  "ref": "m2-avg-margin",
+  "module": 2,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "When is AVG(margin) the wrong statistic, and what is the alternative?",
+  "answer": "When companies differ in size: it weights a small company the same as a huge one. Use SUM(profit)/SUM(revenue) for the aggregate margin. Both are valid answers to different questions - know which you asked.",
+  "tags": [
+   "weighting"
+  ]
+ },
+ {
+  "ref": "m3-count-star",
+  "module": 3,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Difference between COUNT(*), COUNT(column) and COUNT(DISTINCT column)?",
+  "answer": "COUNT(*) counts rows. COUNT(column) counts rows where that column is not NULL. COUNT(DISTINCT column) counts different non-NULL values.",
+  "tags": [
+   "aggregation"
+  ]
+ },
+ {
+  "ref": "m3-where-having",
+  "module": 3,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why can you not put SUM(x) > 100 in a WHERE clause?",
+  "answer": "WHERE filters individual rows before grouping, so the sum does not exist yet. Filtering on an aggregate is HAVING, which runs after grouping.",
+  "tags": [
+   "aggregation"
+  ]
+ },
+ {
+  "ref": "m3-groupby-rule",
+  "module": 3,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why must every selected column be either grouped or aggregated?",
+  "answer": "Once you group, the individual rows are gone. If you ask for a detail column alongside a total, the database has several values in the bucket and no way to know which one you meant, so it refuses.",
+  "tags": [
+   "aggregation"
+  ]
+ },
+ {
+  "ref": "m3-weighted",
+  "module": 3,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "Sector EBITDA margin: SUM(ebitda)/SUM(revenue) or AVG(ebitda/revenue)?",
+  "answer": "The first is the sector's margin. The second is the average of the companies' margins and gives a tiny company equal weight to a giant. Choosing wrongly is invisible in the output, which is what makes it dangerous.",
+  "tags": [
+   "weighting"
+  ]
+ },
+ {
+  "ref": "m3-sign",
+  "module": 3,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "In our ledger, why is expense calculated as debit minus credit and revenue as credit minus debit?",
+  "answer": "Expenses have a normal debit balance and revenue a normal credit balance. Pick one sign convention, write it in a comment at the top of the query, and never change it silently - half of all management reporting confusion is unwritten sign conventions.",
+  "tags": [
+   "ledger"
+  ]
+ },
+ {
+  "ref": "m4-fy",
+  "module": 4,
+  "part": "SQL",
+  "kind": "number",
+  "question": "December 2025 falls in which fiscal year, fiscal quarter and fiscal month in this course?",
+  "answer": "FY26, fiscal quarter 3, fiscal month 9. The year runs April to March, so FY26 is Apr-2025 to Mar-2026.",
+  "tags": [
+   "dates"
+  ]
+ },
+ {
+  "ref": "m4-calendar-first",
+  "module": 4,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why build a time series by starting from a calendar table and LEFT JOINing the data on?",
+  "answer": "Because a month with no rows simply will not appear, and a chart drawn from that result silently joins December to February. Calendar first, facts joined on, is how every correct time series is built.",
+  "tags": [
+   "dates"
+  ]
+ },
+ {
+  "ref": "m4-extract-index",
+  "module": 4,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is wrong with WHERE EXTRACT(YEAR FROM d) = 2025 beyond style?",
+  "answer": "Wrapping the column in a function stops any index on it being used, so the database reads every row. Write d >= '2025-01-01' AND d < '2026-01-01' - same answer, very different plan.",
+  "tags": [
+   "performance",
+   "dates"
+  ]
+ },
+ {
+  "ref": "m4-date-trunc",
+  "module": 4,
+  "part": "SQL",
+  "kind": "query",
+  "question": "How do you turn a daily date into the first day of its month?",
+  "answer": "DATE_TRUNC('month', d)::date. The cast matters - without it you get a timestamp.",
+  "tags": [
+   "dates"
+  ]
+ },
+ {
+  "ref": "m4-lag4",
+  "module": 4,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "In quarterly data, why is LAG(revenue, 4) usually more useful than LAG(revenue, 1)?",
+  "answer": "Four quarters back is the same quarter last year, which strips out seasonality. Quarter-on-quarter growth in a seasonal business is close to meaningless on its own.",
+  "tags": [
+   "windows",
+   "dates"
+  ]
+ },
+ {
+  "ref": "m5-rowcount",
+  "module": 5,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is the one habit that prevents most join disasters?",
+  "answer": "Count the rows before and after every join, and stop if the number changed when you did not expect it to.",
+  "tags": [
+   "joins"
+  ]
+ },
+ {
+  "ref": "m5-two-causes",
+  "module": 5,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "A join changes your row count. Name the two possible causes.",
+  "answer": "Fan-out: the join key is not unique on the right, so rows multiply. Or an inner join dropped rows that had no match. Both are silent.",
+  "tags": [
+   "joins"
+  ]
+ },
+ {
+  "ref": "m5-fanout-budget",
+  "module": 5,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "You join gl_budget to gl_journal_line on account_id and the budget total is 147 times too big. What went wrong and what is the fix?",
+  "answer": "Grain mismatch. Budget is one row per month, account and department; the ledger is one row per transaction. Each budget row was duplicated against every matching ledger line. Aggregate both sides to a common grain first, then join.",
+  "tags": [
+   "joins",
+   "grain"
+  ]
+ },
+ {
+  "ref": "m5-antijoin",
+  "module": 5,
+  "part": "SQL",
+  "kind": "query",
+  "question": "How do you find rows in A with no match in B?",
+  "answer": "LEFT JOIN B onto A, then WHERE B.key IS NULL. Every reconciliation you will ever do is a version of this.",
+  "tags": [
+   "joins"
+  ]
+ },
+ {
+  "ref": "m5-prove-unique",
+  "module": 5,
+  "part": "SQL",
+  "kind": "query",
+  "question": "Before joining on a key, how do you prove it is unique on the other side?",
+  "answer": "SELECT count(*) FROM (SELECT key FROM t GROUP BY key HAVING count(*) > 1) z - it should return zero. Ten seconds, and it prevents most fan-out disasters.",
+  "tags": [
+   "joins"
+  ]
+ },
+ {
+  "ref": "m6-case-order",
+  "module": 6,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why does the order of CASE WHEN branches matter?",
+  "answer": "CASE stops at the first branch that matches. In an ageing report, putting the 90-plus branch first would sweep every overdue invoice into it.",
+  "tags": [
+   "case"
+  ]
+ },
+ {
+  "ref": "m6-sumifs",
+  "module": 6,
+  "part": "SQL",
+  "kind": "query",
+  "question": "What is the SQL equivalent of SUMIFS?",
+  "answer": "SUM(x) FILTER (WHERE condition), or SUM(CASE WHEN condition THEN x ELSE 0 END). Both let one pass over the data produce several columns.",
+  "tags": [
+   "case",
+   "pivot"
+  ]
+ },
+ {
+  "ref": "m6-pivot",
+  "module": 6,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why is conditional aggregation better than running two queries and pasting the results together?",
+  "answer": "One pass over one dataset means the columns cannot disagree with each other. Manual pasting is where errors get in, and it cannot be re-run next month.",
+  "tags": [
+   "pivot"
+  ]
+ },
+ {
+  "ref": "m6-ageing",
+  "module": 6,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is a receivables ageing report and who uses it?",
+  "answer": "Open invoices bucketed by how overdue they are - not yet due, 1-30, 31-60, 61-90, 90 plus. Treasury and FP&A produce it monthly to see which cash is at risk.",
+  "tags": [
+   "finance"
+  ]
+ },
+ {
+  "ref": "m7-cte-why",
+  "module": 7,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why prefer a CTE to a nested subquery?",
+  "answer": "Readability, and therefore reviewability. A query someone else can check is a query someone else can trust. In finance, unreviewable work is worthless.",
+  "tags": [
+   "cte"
+  ]
+ },
+ {
+  "ref": "m7-not-in-null",
+  "module": 7,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What does NOT IN do when the subquery returns even one NULL?",
+  "answer": "It returns no rows at all, silently. Use NOT EXISTS or a LEFT JOIN anti-join, both of which are immune.",
+  "tags": [
+   "null",
+   "cte"
+  ]
+ },
+ {
+  "ref": "m7-debug-cte",
+  "module": 7,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "How do you debug a query with five CTEs?",
+  "answer": "Run the first one alone and check its row count, then add the second, and so on. Build and check in layers, exactly like building a model one tab at a time.",
+  "tags": [
+   "cte"
+  ]
+ },
+ {
+  "ref": "m8-agg-vs-window",
+  "module": 8,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Aggregate versus window function, in one sentence.",
+  "answer": "An aggregate collapses many rows into one. A window function keeps every row and adds a column computed across a group of nearby rows.",
+  "tags": [
+   "windows"
+  ]
+ },
+ {
+  "ref": "m8-where-rank",
+  "module": 8,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Why does WHERE rank = 1 fail, and what do you do instead?",
+  "answer": "Window functions are computed after WHERE runs, so the rank does not exist yet. Wrap the query in a subquery or CTE and filter outside it.",
+  "tags": [
+   "windows"
+  ]
+ },
+ {
+  "ref": "m8-partition",
+  "module": 8,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What does PARTITION BY correspond to in a pivot table?",
+  "answer": "The Rows area - it says which rows belong in the same group. ORDER BY inside the window then says in what sequence, which is what makes 'the previous row' meaningful.",
+  "tags": [
+   "windows"
+  ]
+ },
+ {
+  "ref": "m8-missing-partition",
+  "module": 8,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "A growth query uses LAG(revenue) OVER (ORDER BY period_end) across a table holding 20 companies. What happens?",
+  "answer": "Every company's first quarter is compared with the previous company's last quarter. The query runs perfectly and every twelfth row is nonsense. It needs PARTITION BY company_id.",
+  "tags": [
+   "windows"
+  ]
+ },
+ {
+  "ref": "m8-running-total",
+  "module": 8,
+  "part": "SQL",
+  "kind": "query",
+  "question": "How do you write a running total?",
+  "answer": "SUM(x) OVER (ORDER BY date ROWS UNBOUNDED PRECEDING). Add PARTITION BY if the total should restart per entity.",
+  "tags": [
+   "windows"
+  ]
+ },
+ {
+  "ref": "m9-union-all",
+  "module": 9,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "UNION versus UNION ALL - which one loses data, and when does that matter?",
+  "answer": "UNION removes duplicate rows; UNION ALL keeps everything. Two genuine journal lines for the same amount on the same day are not duplicates, and UNION would silently delete one.",
+  "tags": [
+   "sets"
+  ]
+ },
+ {
+  "ref": "m9-recon-shape",
+  "module": 9,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What shape does a row-level reconciliation always take?",
+  "answer": "Full outer join the two sides, COALESCE the key, show the difference, then filter to the rows where the difference is not zero.",
+  "tags": [
+   "reconciliation"
+  ]
+ },
+ {
+  "ref": "m9-why-differ",
+  "module": 9,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Give three genuine reasons two finance systems disagree on revenue.",
+  "answer": "Different populations (one excludes intercompany), timing (billed versus recognised, cut-off), and treatment (credit notes, deferred revenue, foreign exchange). The job is not to make the gap vanish but to explain what it consists of.",
+  "tags": [
+   "reconciliation"
+  ]
+ },
+ {
+  "ref": "m10-select-first",
+  "module": 10,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What must you do before every UPDATE or DELETE?",
+  "answer": "Run it as a SELECT with the identical WHERE clause and look at exactly the rows you are about to change. Then wrap the change in BEGIN, check the count, and only then COMMIT.",
+  "tags": [
+   "safety"
+  ]
+ },
+ {
+  "ref": "m10-transaction",
+  "module": 10,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Explain a transaction using a spreadsheet analogy.",
+  "answer": "It is the unsaved state of a workbook. Nothing is visible to anyone else and you can close without saving. COMMIT is Save; ROLLBACK is Close Without Saving.",
+  "tags": [
+   "safety"
+  ]
+ },
+ {
+  "ref": "m10-view",
+  "module": 10,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "Is a view a copy of the data?",
+  "answer": "No. It is a saved query that runs each time you select from it, so it is always current. A materialised view is the copy, and it has to be refreshed.",
+  "tags": [
+   "views"
+  ]
+ },
+ {
+  "ref": "m11-index",
+  "module": 11,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is an index, in one sentence with no jargon?",
+  "answer": "The index at the back of a textbook - it lets you jump to the right page instead of reading every one. The cost is that it must be rebuilt every time the book changes.",
+  "tags": [
+   "performance"
+  ]
+ },
+ {
+  "ref": "m11-index-everything",
+  "module": 11,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "Why not index every column?",
+  "answer": "Every index has to be updated on every insert and update, so a heavily written table slows down. Indexes also take space, and one on a low-cardinality column rarely helps anyway.",
+  "tags": [
+   "performance"
+  ]
+ },
+ {
+  "ref": "m11-explain",
+  "module": 11,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What two phrases are you looking for in an EXPLAIN output?",
+  "answer": "'Index Scan' means it jumped straight there; 'Seq Scan' means it read the whole table. Neither is automatically wrong, but a sequential scan of a large table on a filtered query is worth investigating.",
+  "tags": [
+   "performance"
+  ]
+ },
+ {
+  "ref": "m12-scd",
+  "module": 12,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "A customer moves from SMB to Enterprise. Type 1 versus Type 2 slowly changing dimension - which does finance usually want, and why?",
+  "answer": "Type 2. It keeps both rows with valid-from and valid-to dates, so last year's reports still show last year's segmentation. Type 1 overwrites, which silently rewrites history.",
+  "tags": [
+   "modelling"
+  ]
+ },
+ {
+  "ref": "m12-idempotent",
+  "module": 12,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What does idempotent mean for a month-end job?",
+  "answer": "Running it twice produces the same result as running it once. Usually achieved by deleting the period being loaded and re-inserting it, rather than appending.",
+  "tags": [
+   "modelling"
+  ]
+ },
+ {
+  "ref": "m12-star",
+  "module": 12,
+  "part": "SQL",
+  "kind": "concept",
+  "question": "What is a star schema, in ledger terms?",
+  "answer": "One fact table - the journal lines - surrounded by the dimensions that describe them: chart of accounts, cost centres, calendar. Facts are long and thin and grow forever; dimensions are short and wide.",
+  "tags": [
+   "modelling"
+  ]
+ },
+ {
+  "ref": "m12-tests",
+  "module": 12,
+  "part": "SQL",
+  "kind": "query",
+  "question": "Name five data-quality tests worth writing, each of which returns zero rows when healthy.",
+  "answer": "Key uniqueness, no unexpected NULLs, referential integrity (no orphan foreign keys), a control total against the source, and one business rule of your own - for example that every journal balances.",
+  "tags": [
+   "quality"
+  ]
+ },
+ {
+  "ref": "m12-dedupe",
+  "module": 12,
+  "part": "SQL",
+  "kind": "judgement",
+  "question": "What makes two rows 'the same invoice' - vendor plus reference, or vendor plus date plus amount?",
+  "answer": "It depends, and choosing wrongly deletes a genuine invoice. Two different invoices from the same vendor on the same day for the same amount are common. Decide, write the rule down, and report how many rows you dropped.",
+  "tags": [
+   "quality"
+  ]
+ },
+ {
+  "ref": "m13-dep100",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "number",
+  "question": "Depreciation increases by 100, tax rate 25%. Walk all three statements.",
+  "answer": "Income statement: EBIT down 100, net income down 75. Cash flow: net income down 75, add back D&A 100, so cash up 25. Balance sheet: PPE down 100, cash up 25, retained earnings down 75 - and it balances.",
+  "tags": [
+   "three-statements"
+  ]
+ },
+ {
+  "ref": "m13-links",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Name the three links between the statements.",
+  "answer": "Net income flows to retained earnings and starts the cash flow statement. Closing cash from the cash flow statement is the cash line on the balance sheet. Depreciation reduces net income, is added back in the cash flow, and reduces net PPE.",
+  "tags": [
+   "three-statements"
+  ]
+ },
+ {
+  "ref": "m13-profitable-broke",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "How can a profitable company run out of cash?",
+  "answer": "Growth consumes working capital: receivables and inventory rise faster than payables, so cash goes out before it comes in. Add capex and debt repayment and a profitable company can be cash-negative for years.",
+  "tags": [
+   "working-capital"
+  ]
+ },
+ {
+  "ref": "m13-wc-sign",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Does an increase in a working capital asset consume or provide cash?",
+  "answer": "Consumes it. An increase in a working capital liability provides it. Getting this sign backwards is the single most common error in a first cash flow statement.",
+  "tags": [
+   "working-capital"
+  ]
+ },
+ {
+  "ref": "m13-ccc",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the cash conversion cycle and say what it measures.",
+  "answer": "DSO + DIO - DPO. The number of days of cash the business ties up just by operating: how long customers take to pay, plus how long stock sits, less how long you take to pay suppliers.",
+  "tags": [
+   "ratios"
+  ]
+ },
+ {
+  "ref": "m13-roic",
+  "module": 13,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write ROIC and say what question it answers.",
+  "answer": "NOPAT divided by invested capital (debt plus equity less cash). It asks whether the business earns more than its capital costs - if ROIC is below WACC, growth destroys value.",
+  "tags": [
+   "ratios"
+  ]
+ },
+ {
+  "ref": "m14-colours",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What do blue, black and green font mean in a financial model?",
+  "answer": "Blue is a hardcoded input, black is a formula, green is a link to another sheet. A reviewer scans for blue to find every assumption in the model in about four seconds.",
+  "tags": [
+   "excel"
+  ]
+ },
+ {
+  "ref": "m14-hardcode",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "What is wrong with =B12*0.25?",
+  "answer": "The 25% is invisible to anyone reviewing, and impossible to find later. Put the rate in a labelled cell and reference it: =B12*$C$4.",
+  "tags": [
+   "excel"
+  ]
+ },
+ {
+  "ref": "m14-consistent",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Why must a formula be identical all the way across a row?",
+  "answer": "So a reviewer can check one cell and trust the rest. A single edited cell in the middle of a row is the commonest silent model error, and nothing on screen reveals it.",
+  "tags": [
+   "excel"
+  ]
+ },
+ {
+  "ref": "m14-circuit",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is a circuit breaker in a model and when do you use it?",
+  "answer": "A cell holding 0 or 1 that forces the interest calculation to zero, wrapped as =IF($C$2=1,0,...). When iterative calculation blows up into a cascade of errors, flip it, recalculate, flip it back.",
+  "tags": [
+   "excel",
+   "circularity"
+  ]
+ },
+ {
+  "ref": "m14-circ-two-ways",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Name the two ways to handle the interest circularity in a three-statement model.",
+  "answer": "Turn on iterative calculation and charge interest on average debt - precise but fragile. Or charge interest on opening debt, which removes the circularity entirely - slightly less precise and far more robust.",
+  "tags": [
+   "circularity"
+  ]
+ },
+ {
+  "ref": "m14-fake-check",
+  "module": 14,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "A model's balance check reads zero but is hardcoded to zero. How should that be treated?",
+  "answer": "As dishonest, not sloppy. A false assurance is worse than no check, and a reviewer who finds one stops trusting the entire model.",
+  "tags": [
+   "checks"
+  ]
+ },
+ {
+  "ref": "m15-first-check",
+  "module": 15,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Before building any forecast, what must you verify about the historical columns?",
+  "answer": "That the historical balance sheet balances in every period. If history does not balance, the forecast never will, and you will spend a day chasing your own forecast for someone else's error.",
+  "tags": [
+   "three-statements"
+  ]
+ },
+ {
+  "ref": "m15-imbalance-ni",
+  "module": 15,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Your balance sheet is out by exactly net income. What is wrong?",
+  "answer": "Net income is not flowing into retained earnings. If it is out by capex, the sign is wrong in one of the two places capex appears. If the gap doubles each period, something cumulative is being treated as periodic.",
+  "tags": [
+   "debugging"
+  ]
+ },
+ {
+  "ref": "m15-first-period",
+  "module": 15,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Your model breaks in four periods. Where do you start?",
+  "answer": "The first one. Everything after it is contamination, and fixing the earliest break usually fixes all of them.",
+  "tags": [
+   "debugging"
+  ]
+ },
+ {
+  "ref": "m15-wc-formulas",
+  "module": 15,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the three working capital driver formulas.",
+  "answer": "Receivables = DSO/365 x revenue. Inventory = DIO/365 x COGS. Payables = DPO/365 x COGS. Note that inventory and payables run off cost, not revenue.",
+  "tags": [
+   "working-capital"
+  ]
+ },
+ {
+  "ref": "m15-rollforward",
+  "module": 15,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the shape of every schedule in a model.",
+  "answer": "Opening balance + additions - reductions = closing balance. PPE: opening + capex - depreciation. Debt: opening + drawdown - repayment. Equity: opening + net income - dividends.",
+  "tags": [
+   "three-statements"
+  ]
+ },
+ {
+  "ref": "m16-topdown",
+  "module": 16,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Top-down or bottom-up forecast - which would you defend to a CFO, and why?",
+  "answer": "Bottom-up. Units times price, or customers times ARPU, or heads times productivity. Each driver can be attacked and defended separately, which is exactly what a CFO will do.",
+  "tags": [
+   "forecasting"
+  ]
+ },
+ {
+  "ref": "m16-arr-bridge",
+  "module": 16,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the ARR bridge.",
+  "answer": "Opening ARR + new + expansion - contraction - churn = closing ARR. It must tie exactly; a fintech interviewer checks that first.",
+  "tags": [
+   "saas"
+  ]
+ },
+ {
+  "ref": "m16-sanity",
+  "module": 16,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Name three sanity checks on any revenue forecast.",
+  "answer": "Does implied market share stay plausible? Does margin expand forever, and why would competitors allow that? Does the terminal-year ROIC still look like the historical business?",
+  "tags": [
+   "forecasting"
+  ]
+ },
+ {
+  "ref": "m17-npv-trap",
+  "module": 17,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "What does Excel's NPV function assume about the first cash flow, and how do you handle an outflow today?",
+  "answer": "It assumes the first cash flow is one period away. For a cost incurred today write =C4+NPV(rate,D4:H4). Getting this wrong overstates every project by one period of discounting.",
+  "tags": [
+   "tvm"
+  ]
+ },
+ {
+  "ref": "m17-irr-fail",
+  "module": 17,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "When does IRR mislead?",
+  "answer": "When the cash flow signs change more than once it can have several valid answers, and it has none if the flows never turn positive. It also ignores scale - a 40% IRR on 10 rupees loses to a 15% IRR on a million.",
+  "tags": [
+   "tvm"
+  ]
+ },
+ {
+  "ref": "m17-midyear",
+  "module": 17,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is the mid-year convention and why does it raise a valuation?",
+  "answer": "Discounting at t = 0.5, 1.5, 2.5 rather than 1, 2, 3, because cash arrives through the year rather than on 31 December. It removes about half a year of discounting, which is worth several percent.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m17-wacc",
+  "module": 17,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write out WACC.",
+  "answer": "Cost of equity = risk-free + beta x equity risk premium. WACC = E/(D+E) x cost of equity + D/(D+E) x pre-tax cost of debt x (1 - tax rate). The weights are market values, not book.",
+  "tags": [
+   "wacc"
+  ]
+ },
+ {
+  "ref": "m18-unlevered",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Why is free cash flow unlevered in a DCF?",
+  "answer": "Because you are valuing the business before deciding who funds it. Interest is deliberately absent from the build; capital structure enters through the WACC and through the equity bridge.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m18-fcff",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write unlevered free cash flow.",
+  "answer": "EBIT x (1 - tax rate) + depreciation and amortisation - capital expenditure - increase in working capital.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m18-tv-share",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "In a typical DCF, what share of the value sits in the terminal value, and what should you do about it?",
+  "answer": "Sixty to eighty percent. Compute the number in your own model and say it out loud. A DCF is a structured way of showing what you must believe to justify a price, not a machine that produces truth.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m18-bridge",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the bridge from enterprise value to value per share.",
+  "answer": "Enterprise value - net debt - minority interest - preferred + associates = equity value, divided by diluted shares. When the company holds more cash than debt, net debt is negative and you ADD it back.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m18-terminal-capex",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Why should terminal-year capex usually be stepped down to roughly equal depreciation?",
+  "answer": "Because in perpetuity a business only needs to replace what wears out. Carrying an expansion-phase capex number into a 4% perpetual growth calculation understates value in every capital-hungry business.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m18-reverse",
+  "module": 18,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is a reverse DCF and why is it the more honest question?",
+  "answer": "Instead of asking what the share is worth, it asks what growth rate today's price already assumes. You then judge that assumption rather than defending a point estimate of your own.",
+  "tags": [
+   "dcf"
+  ]
+ },
+ {
+  "ref": "m19-ev-pairing",
+  "module": 19,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Why does enterprise value pair with EBITDA and equity value with net income?",
+  "answer": "EBITDA, EBIT and revenue are available to all providers of capital, so they pair with enterprise value. Net income and EPS are after interest, so they belong to shareholders only and pair with equity value. Pairing EV with net income is the classic howler.",
+  "tags": [
+   "comps"
+  ]
+ },
+ {
+  "ref": "m19-ev-bridge",
+  "module": 19,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write the enterprise value bridge from market capitalisation.",
+  "answer": "Market cap + total debt + preferred + minority interest - cash and equivalents = enterprise value.",
+  "tags": [
+   "comps"
+  ]
+ },
+ {
+  "ref": "m19-median",
+  "module": 19,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Why the median rather than the mean of a comp set?",
+  "answer": "One company on a 150 times multiple destroys a mean and tells you nothing. Show the median and the quartiles so the reader sees the spread.",
+  "tags": [
+   "comps"
+  ]
+ },
+ {
+  "ref": "m19-ltm",
+  "module": 19,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is LTM and why does it matter with a comp set?",
+  "answer": "Last twelve months - the most recent four reported quarters. Peers have different year ends, so comparing our April-March year to an American peer's calendar year is not comparing like with like.",
+  "tags": [
+   "comps"
+  ]
+ },
+ {
+  "ref": "m19-precedents",
+  "module": 19,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Why do precedent transaction multiples run above trading comps?",
+  "answer": "Because they include a control premium and the buyer's expected synergies. You pay more for the right to run the business than for a minority stake in it.",
+  "tags": [
+   "comps"
+  ]
+ },
+ {
+  "ref": "m20-three-sources",
+  "module": 20,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What are the three sources of value creation in an LBO, and which one is luck?",
+  "answer": "EBITDA growth, debt paydown, and multiple expansion. Multiple expansion is the market being kind to you; the other two are work. Investment committees ask for the split.",
+  "tags": [
+   "lbo"
+  ]
+ },
+ {
+  "ref": "m20-mom-irr",
+  "module": 20,
+  "part": "Modelling",
+  "kind": "number",
+  "question": "Over a five-year hold, roughly what IRR do 2.0x, 2.5x, 3.0x and 4.0x money multiples correspond to?",
+  "answer": "About 15%, 20%, 25% and 32%. Interviewers expect these instantly.",
+  "tags": [
+   "lbo"
+  ]
+ },
+ {
+  "ref": "m20-sources-uses",
+  "module": 20,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is the first thing you check in any transaction model?",
+  "answer": "That sources equal uses. If they do not, nothing downstream means anything.",
+  "tags": [
+   "lbo"
+  ]
+ },
+ {
+  "ref": "m20-paper",
+  "module": 20,
+  "part": "Modelling",
+  "kind": "number",
+  "question": "Paper LBO: entry EBITDA 100 at 10x, 6x leverage, EBITDA grows to 150, debt falls to 300, exit at 10x. MoM and IRR?",
+  "answer": "Entry EV 1000, debt 600, equity 400. Exit EV 1500, less debt 300, equity 1200. MoM 3.0x, so roughly a 25% IRR over five years.",
+  "tags": [
+   "lbo"
+  ]
+ },
+ {
+  "ref": "m20-pik",
+  "module": 20,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is PIK interest and what does it do to the model?",
+  "answer": "Payment in kind - the interest accrues onto the loan balance instead of being paid in cash. It does not hit cash flow but it grows the debt, so leverage rises even when nothing goes wrong.",
+  "tags": [
+   "lbo",
+   "credit"
+  ]
+ },
+ {
+  "ref": "m21-accretion",
+  "module": 21,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "In an all-stock deal, when is the transaction accretive before synergies?",
+  "answer": "When the acquirer's P/E is higher than the target's - you are buying earnings more cheaply than the market prices your own.",
+  "tags": [
+   "ma"
+  ]
+ },
+ {
+  "ref": "m21-breakeven",
+  "module": 21,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is the breakeven synergy, and why does the board care about it more than the EPS number?",
+  "answer": "The annual pre-tax synergy at which the deal is exactly EPS-neutral. It converts an abstract argument about strategy into one number management has to commit to delivering.",
+  "tags": [
+   "ma"
+  ]
+ },
+ {
+  "ref": "m21-ppa",
+  "module": 21,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Where does goodwill come from in an acquisition?",
+  "answer": "The premium over the fair value of identifiable net assets. Assets written up to fair value are then depreciated or amortised, hitting future earnings; goodwill is not amortised but is tested for impairment.",
+  "tags": [
+   "ma"
+  ]
+ },
+ {
+  "ref": "m22-lender-question",
+  "module": 22,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "How does a lender's question differ from an equity investor's?",
+  "answer": "Equity asks how much this could be worth. Credit asks what the chance is of not being repaid and what is recovered if that happens. Downside cases matter more than base cases - the reverse of a DCF.",
+  "tags": [
+   "credit"
+  ]
+ },
+ {
+  "ref": "m22-covenant-types",
+  "module": 22,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Maintenance versus incurrence covenant?",
+  "answer": "A maintenance covenant is tested every quarter regardless. An incurrence covenant only bites when the company does something - raises debt, pays a dividend, makes an acquisition.",
+  "tags": [
+   "credit"
+  ]
+ },
+ {
+  "ref": "m22-deliverable",
+  "module": 22,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "What is the actual deliverable of a covenant model?",
+  "answer": "The quarter of breach under a defined downside. 'Covenants break in Q3 FY28 if revenue falls 12%' is a credit memo. 'Leverage looks high' is not.",
+  "tags": [
+   "credit"
+  ]
+ },
+ {
+  "ref": "m22-dscr",
+  "module": 22,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write DSCR and say roughly where it becomes a problem.",
+  "answer": "Cash available for debt service divided by debt service (interest plus mandatory amortisation). Below about 1.2x breaches most loan agreements.",
+  "tags": [
+   "credit",
+   "ratios"
+  ]
+ },
+ {
+  "ref": "m23-pvm",
+  "module": 23,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Decompose a revenue variance into price, volume and mix.",
+  "answer": "Volume variance = (actual units - budget units) x budget price. Price variance = (actual price - budget price) x actual units. Mix is the residual effect of selling a different blend of products.",
+  "tags": [
+   "fpa"
+  ]
+ },
+ {
+  "ref": "m23-timing",
+  "module": 23,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Why does the timing versus permanent distinction matter in variance analysis?",
+  "answer": "A cost that slipped from March to April is not an overspend, and treating it as one wastes everyone's afternoon. A cost that has stepped up permanently changes the forecast. Same variance, opposite responses.",
+  "tags": [
+   "fpa"
+  ]
+ },
+ {
+  "ref": "m23-rolling",
+  "module": 23,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "What is a rolling forecast and why is it better than an annual budget by June?",
+  "answer": "Always twelve months ahead, re-cut every month. The annual budget was locked before the year started and is stale by the second quarter; the rolling forecast reflects what you now know.",
+  "tags": [
+   "fpa"
+  ]
+ },
+ {
+  "ref": "m23-commentary",
+  "module": 23,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "'Revenue fell 4%.' Why is that not commentary?",
+  "answer": "The board can read that off the chart. Commentary says why it fell, whether it continues, and what you want them to do about it.",
+  "tags": [
+   "fpa",
+   "writing"
+  ]
+ },
+ {
+  "ref": "m24-nrr",
+  "module": 24,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Define net revenue retention and say what above 100% means.",
+  "answer": "(Opening ARR + expansion - contraction - churn) divided by opening ARR, excluding new customers. Above 100% means the existing base grows by itself - the headline metric of the subscription industry.",
+  "tags": [
+   "saas"
+  ]
+ },
+ {
+  "ref": "m24-ltv-overstated",
+  "module": 24,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "Why is LTV usually overstated?",
+  "answer": "It assumes a constant churn rate forever. Real cohort curves flatten - early churn is high and survivors stay much longer - and the constant-rate formula is very sensitive to which churn number you pick.",
+  "tags": [
+   "saas"
+  ]
+ },
+ {
+  "ref": "m24-cac-payback",
+  "module": 24,
+  "part": "Modelling",
+  "kind": "formula",
+  "question": "Write CAC payback and say what counts as good.",
+  "answer": "CAC divided by (monthly ARPU x gross margin), in months. Under twelve is good; over twenty-four means growth is a funding problem rather than a business model.",
+  "tags": [
+   "saas"
+  ]
+ },
+ {
+  "ref": "m24-scenario",
+  "module": 24,
+  "part": "Modelling",
+  "kind": "concept",
+  "question": "Difference between a sensitivity and a scenario?",
+  "answer": "A sensitivity moves one variable. A scenario moves a coherent set of them together - base, upside, downside - driven from a single switch cell so one input changes the whole model.",
+  "tags": [
+   "scenarios"
+  ]
+ },
+ {
+  "ref": "m24-automate",
+  "module": 24,
+  "part": "Modelling",
+  "kind": "judgement",
+  "question": "What does automating the monthly pack actually buy the business?",
+  "answer": "Two hours of manual work becomes ten seconds, identically, every month. The real gain is not the time - it is that the numbers are reproducible and the errors are fixed once rather than re-made monthly.",
+  "tags": [
+   "python"
+  ]
+ },
+ {
+  "ref": "m25-import-direct",
+  "module": 25,
+  "part": "BI",
+  "kind": "concept",
+  "question": "Import mode versus DirectQuery - which and why?",
+  "answer": "Import copies the data into the file and is fast, so it is the default. DirectQuery leaves the data in the database and queries it live - use it only when the data is too large to import or must be up to the second.",
+  "tags": [
+   "powerbi"
+  ]
+ },
+ {
+  "ref": "m25-measure-column",
+  "module": 25,
+  "part": "BI",
+  "kind": "concept",
+  "question": "Calculated column versus measure - what is the difference, and which should you default to?",
+  "answer": "A column is computed row by row and stored in the file. A measure is computed on the fly for whatever the user has filtered. Default to measures: they respond to slicers, and they do not bloat the model.",
+  "tags": [
+   "powerbi",
+   "dax"
+  ]
+ },
+ {
+  "ref": "m25-calculate",
+  "module": 25,
+  "part": "BI",
+  "kind": "formula",
+  "question": "What does CALCULATE do in DAX, in one sentence?",
+  "answer": "It evaluates an expression with the filter context changed - it is SUMIFS for a data model, and it is the function everything else in DAX is built on.",
+  "tags": [
+   "dax"
+  ]
+ },
+ {
+  "ref": "m25-star-bi",
+  "module": 25,
+  "part": "BI",
+  "kind": "judgement",
+  "question": "Why does Power BI want a star schema rather than one wide table?",
+  "answer": "Filters travel from dimension to fact along relationships. One wide table has nothing to filter by, and several fact tables joined to each other produce ambiguous filter paths and wrong totals.",
+  "tags": [
+   "powerbi",
+   "modelling"
+  ]
+ },
+ {
+  "ref": "m25-date-table",
+  "module": 25,
+  "part": "BI",
+  "kind": "concept",
+  "question": "Why must a Power BI model have a marked date table?",
+  "answer": "Time intelligence functions - year to date, same period last year - require one, and our April-March fiscal year has to come from a table rather than from the date column itself.",
+  "tags": [
+   "powerbi",
+   "dates"
+  ]
+ },
+ {
+  "ref": "m25-rls",
+  "module": 25,
+  "part": "BI",
+  "kind": "concept",
+  "question": "What is row-level security in Power BI and when does finance need it?",
+  "answer": "Rules that limit which rows a given viewer sees - a regional manager sees only their region. Finance needs it whenever a single report serves people who must not see each other's numbers, such as departmental cost reports.",
+  "tags": [
+   "powerbi"
+  ]
+ }
+]

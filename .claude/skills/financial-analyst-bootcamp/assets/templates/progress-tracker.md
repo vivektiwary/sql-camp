@@ -77,17 +77,48 @@ Status: `not started` / `in progress` / `passed` / `needs re-test`
 | — | **Capstone 4 — own it** | | | | |
 | — | **Mock interview 3 — case and behavioural** | | | | |
 
+### Part 3 — Power BI
+
+Power BI Desktop is Windows-only. Record here which route the student took
+(virtual machine, cloud PC, or browser-only fallback) and the date it worked,
+because it takes a day to arrange and blocks the whole of Part 3.
+
+**Windows route chosen:** _________________  **Working since:** __________
+
+| # | Module | Status | Quiz | Date | Notes |
+|---|---|---|---|---|---|
+| 25 | Getting data in, and modelling it | not started | | | |
+| 26 | DAX | not started | | | |
+| 27 | Report design, security, publishing | not started | | | |
+| — | **Unit Test 7** | | | | |
+| — | **Capstone 5 — live management pack** | | | | |
+
 ---
 
 ## Recall bank
 
-Things to ask in the warm-up. Add every mistake here the day it happens, and
-remove an item only after it has been answered correctly twice on different
-days.
+**This is automated — do not keep it by hand.** `scripts/srs.py` schedules
+every review, tracks every lapse, and flags what is being forgotten.
 
-| Added | Question / concept | Times right | Retired |
-|---|---|---|---|
-| | | | |
+```bash
+python3 scripts/srs.py due --json --limit 5     # start of every session
+python3 scripts/srs.py grade <id> <0-5>         # after asking each one
+python3 scripts/srs.py stats                    # before every unit test
+```
+
+Add a card for every mistake, on the day it happens, in the student's own
+words. See `references/spaced-repetition.md`.
+
+**Last `srs.py stats` snapshot** (paste it here each week so the trend is
+visible, not just today's number):
+
+```
+(paste output here)
+```
+
+**Modules currently below 1.7 average ease — re-teach before the next test:**
+
+-
 
 ---
 

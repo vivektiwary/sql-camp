@@ -824,3 +824,8 @@ It must run end to end from a cold start with one command.
 
 **Unit Test 6**, then the **Final exam**, then the capstones and mock
 interviews in `references/capstones-and-jobs.md`.
+
+Then **Part 3, Power BI** (`references/powerbi-track.md`). Raise the Windows
+problem now rather than in three weeks: Power BI Desktop does not run on
+macOS, and arranging a virtual machine takes a day and may cost money. The
+options are set out at the top of that file.

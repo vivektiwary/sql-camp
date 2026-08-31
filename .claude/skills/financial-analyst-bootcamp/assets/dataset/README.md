@@ -43,6 +43,23 @@ from the ledger and check it against the reported statements.
 | `dim_department` | cost centre (8) | Engineering, Sales, Marketing, … |
 | `dim_customer` | customer of Meridian (900) | Segment, country, signup date, acquisition channel |
 
+### How share counts were set
+
+Revenue, profits and share prices are generated independently, which would
+leave the implied price/earnings ratios meaningless — and the valuation
+modules stand or fall on market capitalisation being credible. So the share
+count is solved for **last**: given each company's FY26 profit, its
+31-Mar-2026 share price and a sensible sector P/E, there is exactly one share
+count that makes the three agree.
+
+It is the same trick as a balance sheet plug, applied to the equity story, and
+it is why EV/EBITDA across the 20 companies runs from about 2× for a cement
+maker to about 21× for a cloud software business rather than landing at random.
+
+One company, Aravalli Steel (`ARVT`), loses money in FY26. Its share count is
+solved from EV/EBITDA instead, because a P/E on a loss is meaningless. That is
+on purpose: it is the worked example for why enterprise value multiples exist.
+
 ### Market data
 
 | Table | Grain | Notes |

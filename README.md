@@ -18,13 +18,20 @@ loaded — not by reading a textbook alone.
 │   ├── teaching-playbook.md          how to explain this to a non-technical person
 │   ├── curriculum-sql.md             Part 1: Modules 0-12
 │   ├── curriculum-modelling.md       Part 2: Modules 13-24
+│   ├── powerbi-track.md              Part 3: Modules 25-27 (and the Mac problem)
+│   ├── spaced-repetition.md          how the retention drill works
 │   ├── assessment-bank.md            quizzes, unit tests, midterm, final, rubrics
 │   ├── capstones-and-jobs.md         projects, portfolio, mock interviews
 │   └── glossary.md                   plain-English definitions
 ├── assets/
 │   ├── dataset/                      the practice database (schema + data + health check)
+│   ├── models/                       three worked Excel models that balance
+│   ├── srs/                          the spaced-repetition seed deck (118 cards)
 │   └── templates/                    progress tracker, model build checklist
-└── scripts/setup_db.sh               one command to build the database
+└── scripts/
+    ├── setup_db.sh                   one command to build the database
+    ├── srs.py                        the spaced-repetition scheduler
+    └── build_reference_models.py     rebuilds the Excel models from the database
 ```
 
 ## Getting started
@@ -66,11 +73,48 @@ Excel discipline, the three-statement model, forecasting, time value of money,
 DCF, comps, LBO, M&A accretion/dilution, credit analysis, FP&A and variance
 analysis, unit economics, scenarios and Python.
 
-Assessment runs throughout: check-yourself questions every lesson, a quiz
-every module, six timed unit tests, a midterm and a final exam, four capstone
-projects and three mock interviews. Pass mark is 70%.
+**Part 3 — Power BI for finance (Modules 25–27).** Power Query, star schemas
+and relationships, DAX and time intelligence on an April–March fiscal year,
+report design for a finance audience, row-level security, publishing.
 
-Roughly 20 weeks at two 90-minute sessions a week, plus homework.
+> **Power BI Desktop does not run on macOS.** Part 3 needs Windows in a
+> virtual machine, a cloud PC, or (with real limitations) the browser-based
+> Power BI Service. The options, costs and the database networking setup are
+> all in `references/powerbi-track.md`. Arrange it a week before you need it.
+
+Assessment runs throughout: a spaced-repetition drill every session,
+check-yourself questions every lesson, a quiz every module, seven timed unit
+tests, a midterm and a final exam, five capstone projects and three mock
+interviews. Pass mark is 70%.
+
+Roughly 23 weeks at two 90-minute sessions a week, plus homework.
+
+## Retention is automated
+
+Most courses test what you knew on the day. This one tracks what you still
+know three months later:
+
+```bash
+python3 .claude/skills/financial-analyst-bootcamp/scripts/srs.py init
+python3 .claude/skills/financial-analyst-bootcamp/scripts/srs.py due --json --limit 5
+python3 .claude/skills/financial-analyst-bootcamp/scripts/srs.py stats
+```
+
+118 seeded cards covering all 28 modules, SM-2 scheduling, and a leech
+detector that tells the tutor when to stop re-asking a question and go back
+and re-teach the idea underneath it.
+
+## Worked reference models
+
+`assets/models/` holds three complete Excel models — a balancing
+three-statement forecast, a DCF with comps and a reverse DCF, and an LBO with
+returns attribution. Every check cell reads zero, verified by recalculation.
+
+They are the target you compare your own build against, **after** you have
+attempted it. They also reach honest conclusions: the DCF says Kaveri Retail
+is 28% overvalued, and the LBO says the default deal returns 9.5% and should
+not be done. A model that always says "buy" has not been built, it has been
+arranged.
 
 ## The practice database
 

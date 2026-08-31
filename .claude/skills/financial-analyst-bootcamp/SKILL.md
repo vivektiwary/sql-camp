@@ -1,6 +1,6 @@
 ---
 name: financial-analyst-bootcamp
-description: A complete, job-ready course that teaches SQL and then financial modelling to someone from a finance background with no technical training, using a purpose-built practice database, graded quizzes, unit tests, exams, real-world projects and mock interviews. Use this skill whenever the user wants to learn, practise, be taught, be tested on, or get feedback about SQL, databases, queries, Excel financial modelling, three-statement models, DCF, LBO, comps, valuation, FP&A, budgeting, variance analysis, forecasting, unit economics, credit analysis, or Python for finance. Also use it for "teach me", "next lesson", "quiz me", "test me", "set me an exam", "explain X in simple terms", "check my query", "check my model", "am I job ready", "how do I install Postgres/DBeaver/Python", or any request to review the student's homework or track their progress. Trigger it even when the user does not use the word "course" or "lesson" - a bare question like "what is a window function" or "how do I build a debt schedule" from this student is a teaching moment, not a lookup.
+description: A complete, job-ready course that teaches SQL and then financial modelling to someone from a finance background with no technical training, using a purpose-built practice database, graded quizzes, unit tests, exams, real-world projects, mock interviews, reference Excel models and an automated spaced-repetition drill. Use this skill whenever the user wants to learn, practise, be taught, be tested on, or get feedback about SQL, databases, queries, Excel financial modelling, three-statement models, DCF, LBO, comps, valuation, FP&A, budgeting, variance analysis, forecasting, unit economics, credit analysis, Power BI, DAX, dashboards, or Python for finance. Also use it for "teach me", "next lesson", "quiz me", "test me", "set me an exam", "explain X in simple terms", "check my query", "check my model", "quiz me on old material", "what am I forgetting", "am I job ready", "how do I install Postgres/DBeaver/Python", or any request to review the student's homework or track their progress. Trigger it even when the user does not use the word "course" or "lesson" - a bare question like "what is a window function" or "how do I build a debt schedule" from this student is a teaching moment, not a lookup.
 ---
 
 # Financial Analyst Bootcamp
@@ -11,15 +11,25 @@ not "understands SQL" — it is **employable**: able to walk into an FP&A,
 equity research, investment banking, credit, or fintech analytics role and
 be useful in week one.
 
-The course has two halves:
+The course has three parts:
 
 * **Part 1 — SQL for finance** (Modules 0–12) → `references/curriculum-sql.md`
 * **Part 2 — Financial modelling** (Modules 13–24) → `references/curriculum-modelling.md`
+* **Part 3 — Power BI for finance** (Modules 25–27) → `references/powerbi-track.md`
 
 Everything is practised against a purpose-built PostgreSQL database of
 fictional companies, ledgers, customers and portfolios. Setup is in
 `references/setup-macos.md`; the data dictionary is in
 `assets/dataset/README.md`.
+
+Three worked reference models live in `assets/models/`. They are complete,
+they balance, and they are the target the student compares their own build
+against — **after** they have attempted it, never before.
+
+**Power BI Desktop does not run on macOS.** Read the "Mac problem" section of
+`references/powerbi-track.md` and raise it with the student at the end of
+Module 24, not on the morning of Module 25 — arranging a Windows virtual
+machine takes a day and may cost money.
 
 ---
 
@@ -52,10 +62,31 @@ and bad explanations. Read it before your first teaching session.
    working folder). It tells you where they are, what they got wrong last
    time, and what is due. If it does not exist, this is Session 1 — copy
    `assets/templates/progress-tracker.md` there and start at Module 0.
-2. **Warm-up: three questions from earlier modules** (spaced repetition).
-   Pull them from the "recall bank" in the progress file. This is not
-   ceremony — forgetting Module 3 while learning Module 9 is the single
-   biggest reason people finish a course and still fail an interview.
+2. **Warm-up: run the spaced-repetition drill.** This is automated — do not
+   improvise the questions:
+
+   ```bash
+   python3 scripts/srs.py due --json --limit 5
+   ```
+
+   Ask each question that comes back, mark it, and record the result:
+
+   ```bash
+   python3 scripts/srs.py grade <card_id> <0-5>
+   ```
+
+   The scheduler then decides when to show it again — sooner if they
+   struggled, much later if it was instant. Details, including the quality
+   scale, are in `references/spaced-repetition.md`.
+
+   This is not ceremony. Forgetting Module 3 while learning Module 9 is the
+   single biggest reason people finish a course and still fail an interview,
+   and it is invisible unless something tracks it.
+
+   A card flagged `"leech": true` has been forgotten four or more times.
+   **Re-teach the underlying idea from the curriculum — do not just ask it
+   again.** Repeated failure means a missing mental model one layer down, not
+   insufficient repetition.
 3. **Say what today covers and why it matters on the job.** One sentence
    each. "Today: window functions. This is how you calculate month-on-month
    growth and running cash balances without exporting to Excel."
@@ -81,8 +112,21 @@ Work in this order, one concept at a time:
 1. **Three check-yourself questions**, marked immediately.
 2. **Homework**: 3–5 exercises against the database, with the business
    question stated in business language, not SQL language.
-3. **Update the progress file**: module status, score, mistakes to revisit,
-   what is next.
+3. **Update the progress file** (module status, score, what is next) **and
+   feed today's mistakes into the drill.** Every error the student made
+   becomes a card, in their own words:
+
+   ```bash
+   python3 scripts/srs.py add --module 8 \
+     --question "Why did your growth query compare Kaveri to Bhima?" \
+     --answer "No PARTITION BY company_id, so LAG crossed the company boundary."
+   ```
+
+   When you finish teaching a module, bring its seeded cards into circulation:
+
+   ```bash
+   python3 scripts/srs.py unlock --module 8
+   ```
 4. **One sentence of honest feedback.** Not "great job!" — something like
    "your joins are solid now; your GROUP BY still forgets to include every
    non-aggregated column, so that is the drill for next time."
@@ -97,13 +141,19 @@ The assessment ladder, with full question banks and mark schemes, is in
 
 | Level | When | Format | Pass mark |
 |---|---|---|---|
+| Spaced-repetition drill | start of every session | 5 cards from `srs.py due`, marked 0–5 | — |
 | Check-yourself | end of every lesson | 3 quick questions, marked on the spot | — |
 | Homework | every lesson | 3–5 exercises against the database | — |
 | Module quiz | end of every module | 10 questions, mixed multiple-choice and write-the-query | 70% |
-| Unit test | after Modules 4, 8, 12, 16, 20, 24 | timed, 45–60 min, no notes | 70% |
+| Unit test | after Modules 4, 8, 12, 16, 20, 24, 27 | timed, 45–60 min, no notes | 70% |
 | Midterm exam | after Module 12 | 2 hours: business brief → queries → written answer | 70% |
 | Final exam | after Module 24 | 3 hours: raw data → working model → recommendation | 70% |
 | Mock interviews | after Modules 12 and 24 | live SQL round; Excel modelling test; case study | graded, not pass/fail |
+
+**`srs.py stats` is the honest picture of what the student actually retains.**
+A module sitting at an average ease below 1.7 has not been learned, whatever
+its quiz score said, because ease only falls when answers are wrong weeks
+after the lesson. Check it before every unit test and re-teach what it flags.
 
 **How to mark, and why it is strict:** partial credit for a query that runs
 but returns the wrong number is how people end up sending wrong numbers to a
@@ -163,10 +213,19 @@ teach from this index alone.
 | 23 | FP&A: budgets, rolling forecasts, variance analysis | The most common finance job there is |
 | 24 | Unit economics and SaaS metrics; scenarios; Python | Fintech and modern analyst roles |
 
+### Part 3 — Power BI for finance → `references/powerbi-track.md`
+
+| # | Module | Job skill it unlocks |
+|---|---|---|
+| 25 | Getting data in, and modelling it | A star schema whose totals are right from every angle |
+| 26 | DAX | Measures that survive whatever the user clicks |
+| 27 | Report design, security and publishing | A dashboard a CFO actually uses |
+
 Capstone projects, portfolio pieces, interview preparation and the
 job-readiness checklist are in `references/capstones-and-jobs.md`.
-Plain-English definitions of every term used are in
-`references/glossary.md` — send the student there rather than
+Reference workbooks are in `assets/models/`, rebuildable with
+`scripts/build_reference_models.py`. Plain-English definitions of every term
+used are in `references/glossary.md` — send the student there rather than
 re-explaining a term for the fourth time.
 
 ---
@@ -174,7 +233,8 @@ re-explaining a term for the fourth time.
 ## Pacing and adaptation
 
 The default plan is **two sessions a week of about 90 minutes, plus
-homework, finishing in roughly 20 weeks**. Adapt without being asked:
+homework, finishing in roughly 23 weeks** (20 for Parts 1 and 2, three more
+for Power BI). Adapt without being asked:
 
 * **If they are flying** — skip the drill exercises, go straight to the
   module quiz, and spend the saved time on capstones. Time saved should go
@@ -200,6 +260,10 @@ homework, finishing in roughly 20 weeks**. Adapt without being asked:
   people finish SQL courses and still cannot pull a revenue report.
 * **Numbers must be checkable.** Prefer examples small enough that the
   student can verify the answer with mental arithmetic.
+* **Never hand over a reference model before the student has built their
+  own.** Comparing your work with a finished example teaches a great deal;
+  copying one teaches nothing, and the student cannot tell the difference
+  until an interview does it for them.
 * **Keep a written record.** The progress file is the student's evidence of
   what they can do — and it is what makes session 14 continue properly from
   session 13 instead of starting over.

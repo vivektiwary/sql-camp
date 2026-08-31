@@ -78,6 +78,17 @@ profitable after acquisition cost; whether Meridian should raise prices;
 which of the 20 companies has the best cash conversion and why; whether the
 Bluewater portfolios are taking sector risk they intend to.
 
+### Capstone 5 — The live management pack *(after Module 27)*
+
+Full brief in `references/powerbi-track.md`. Rebuild Capstone 1 as a Power BI
+dashboard connected to `sqlcamp`, with a documented star schema, a described
+measure set, three report pages and working row-level security.
+
+**What is really being tested.** Whether the numbers agree with Capstone 1.
+Rebuilding a pack in a new tool and getting different totals is the most
+common and most damaging outcome, because it destroys trust in both versions.
+Reconciling them is the exercise.
+
 ---
 
 <a name="portfolio"></a>
@@ -93,6 +104,9 @@ By the end, the student should have a public GitHub repository containing:
   reconciliation, a data-quality test suite, a cleaning script.
 * **Two or three Excel models**, with the checks visible.
 * **The Python script** that produces the monthly pack.
+* **The Power BI file**, with a screenshot in the README - most people looking
+  at the repository will not have Power BI installed, and a dashboard nobody
+  can see is a dashboard nobody credits you for.
 * **Three short write-ups** — the board commentary, the research note, the
   credit memo. These matter more than the code and get read first.
 
@@ -238,6 +252,14 @@ work, and pretending otherwise helps nobody.
 - [ ] Distinguishes timing from permanent
 - [ ] Writes commentary a CFO would forward unedited
 
+**Power BI**
+- [ ] Builds a star schema and can justify every relationship's direction
+- [ ] Writes measures rather than calculated columns, and knows why
+- [ ] Uses CALCULATE confidently, including time intelligence
+- [ ] Handles the April-March fiscal year correctly in DAX
+- [ ] Designs a page that leads with the answer, not with the slicers
+- [ ] Can reconcile a dashboard back to the underlying SQL, to the rupee
+
 **Professional**
 - [ ] Explains a technical result to a non-technical person in one sentence
 - [ ] Says "I don't know, here is how I would find out"
@@ -255,8 +277,8 @@ student's target roles:
 
 1. **dbt** — how teams manage SQL properly. A weekend to learn, and it appears
    in a growing share of finance-analytics job specs.
-2. **Power BI or Tableau** — because someone will ask for a dashboard, and
-   the SQL underneath is already familiar.
+2. **Tableau, if a target employer uses it** — the concepts transfer directly
+   from Modules 25-27; only the syntax changes.
 3. **Deeper Python** — proper pandas, then `statsmodels` if forecasting
    interests them.
 4. **A domain certification if the target role demands it** — CFA for research

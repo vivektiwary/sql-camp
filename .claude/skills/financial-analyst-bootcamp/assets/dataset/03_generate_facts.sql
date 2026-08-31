@@ -329,6 +329,57 @@ FROM build_fs_model m;
 
 DROP TABLE build_fs_model;
 
+-- --- Calibrate the share count -----------------------------------------
+-- Revenue, profit and share prices were generated independently above, which
+-- would leave the implied price/earnings ratios meaningless -- and Modules
+-- 18-20 are built on market capitalisation being credible.
+--
+-- So the share count is solved for last: given each company's FY26 profit,
+-- its 31-Mar-2026 share price and a sensible sector P/E, there is exactly one
+-- share count that makes the three agree. That is the number we store.
+-- It is the same trick as a balance sheet plug, applied to the equity story.
+WITH fy26 AS (
+    SELECT company_id, SUM(net_income) AS ni, SUM(ebitda) AS ebitda
+    FROM fs_income_statement
+    WHERE period_end > DATE '2025-03-31' AND period_end <= DATE '2026-03-31'
+    GROUP BY company_id
+),
+target AS (
+    SELECT f.company_id, f.ni, p.close_px,
+           (CASE c.sector
+              WHEN 'Information Technology'  THEN 32 WHEN 'Health Care'     THEN 28
+              WHEN 'Consumer Staples'        THEN 34 WHEN 'Consumer Discretionary' THEN 26
+              WHEN 'Communication Services'  THEN 18 WHEN 'Financials'      THEN 14
+              WHEN 'Industrials'             THEN 20 WHEN 'Utilities'       THEN 16
+              WHEN 'Energy'                  THEN 11 ELSE 15 END
+            * (0.85 + 0.30 * prand(c.ticker||'pe')))::numeric AS target_pe
+           , f.ebitda, b.short_term_debt + b.long_term_debt - b.cash AS net_debt
+    FROM fy26 f
+    JOIN dim_company c USING (company_id)
+    JOIN fact_price p ON p.company_id = f.company_id AND p.price_date = DATE '2026-03-31'
+    JOIN fs_balance_sheet b ON b.company_id = f.company_id AND b.period_end = DATE '2026-03-31'
+)
+UPDATE dim_company c
+SET shares_out_m = ROUND(
+        CASE
+          -- Profitable company: solve the share count from a sector P/E.
+          WHEN t.ni > 0 THEN t.ni * t.target_pe / t.close_px
+          -- Loss-maker: a P/E is meaningless, so value the whole business on
+          -- EV/EBITDA and back out what is left for equity after the debt.
+          -- One company in this dataset lands here on purpose -- it is the
+          -- worked example for why EV multiples exist at all.
+          ELSE GREATEST(t.ebitda * 4.5 - t.net_debt, t.ebitda * 0.5) / t.close_px
+        END, 2)
+FROM target t
+WHERE t.company_id = c.company_id;
+
+-- Restate diluted shares and EPS on the calibrated share count.
+UPDATE fs_income_statement i
+SET shares_diluted_m = c.shares_out_m,
+    eps_diluted      = ROUND(i.net_income / NULLIF(c.shares_out_m, 0), 4)
+FROM dim_company c
+WHERE c.company_id = i.company_id;
+
 -- =====================================================================
 -- 4. OUR COMPANY'S GENERAL LEDGER, BUDGET AND HEADCOUNT
 -- ---------------------------------------------------------------------

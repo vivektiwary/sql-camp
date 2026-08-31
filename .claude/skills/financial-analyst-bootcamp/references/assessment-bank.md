@@ -58,6 +58,12 @@ first — that is the one that would have sent a wrong number to the CFO."
 <a name="checks"></a>
 ## Check-yourself questions by module
 
+These are asked once, at the end of the lesson. Keeping them alive over the
+following months is a different job, done by the spaced-repetition drill —
+`scripts/srs.py`, documented in `references/spaced-repetition.md`. The seeded
+deck already contains a card for most of the questions below, so you do not
+need to re-enter them.
+
 Three per module, asked at the end of the lesson, answered out loud, marked
 immediately. These test understanding, not recall of syntax.
 
@@ -252,6 +258,7 @@ now automatic.
 | **UT4** | Module 16 | Accounting links, Excel discipline, three-statement build, forecasting | Written + a small model build, 90 min |
 | **UT5** | Module 20 | TVM, DCF, comps, LBO | Written + a paper LBO under time pressure, 90 min |
 | **UT6** | Module 24 | M&A, credit, FP&A, unit economics, Python | Written + a variance analysis, 90 min |
+| **UT7** | Module 27 | Power BI modelling, DAX, report design, security | Written + a dashboard critique, 60 min. Paper in `references/powerbi-track.md` |
 
 **UT1 sample paper.**
 
